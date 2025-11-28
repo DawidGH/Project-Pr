@@ -40,7 +40,7 @@ int main() {
     bool czyDalej = true;
 
     while (czyDalej) {
-        std::cout << "\n=== MENU MERGE SORT ===\n";
+        std::cout << "\n MENU MERGE SORT \n";
         std::cout << "1. Sortuj INT\n";
         std::cout << "2. Sortuj DOUBLE\n";
         std::cout << "0. Wyjscie\n";
