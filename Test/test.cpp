@@ -1,144 +1,129 @@
-#include "test1.h"
-#include "mergeSort.h"
+#include "gtest/gtest.h"
 #include <vector>
+#include <algorithm>
+#include <random>
+#include "mergeSort.h" 
 
-// Zak³adamy, ¿e mergeSort.h zawiera namespace custom_sort
-using std::vector;
-using namespace custom_sort; // U³atwienie, aby nie pisaæ custom_sort:: wszêdzie
-
-TEST(MergeSortTest, SortedArrayRemainsSorted) {
-    // ZMIANA: Usuniêto: mergeSort<int> sorter;
-    vector<int> arr = { 1, 2, 3, 4, 5 };
-
-    // ZMIANA: Wywo³anie funkcji globalnej na zakresie
-    merge_sort(arr.begin(), arr.end());
-
-    EXPECT_EQ(arr, (vector<int>{1, 2, 3, 4, 5}));
+// 1. Ju¿ posortowana
+TEST(MergeSortTest, Req01_AlreadySorted) {
+    MergeSorter<int> sorter;
+    std::vector<int> input = { 1, 2, 3, 4, 5 };
+    std::vector<int> expected = { 1, 2, 3, 4, 5 };
+    sorter.sort(input);
+    EXPECT_EQ(input, expected);
 }
 
-TEST(MergeSortTest, ReverseArrayGetsSorted) {
-    // ZMIANA: Usuniêto: mergeSort<int> sorter;
-    vector<int> arr = { 5,4,3,2,1 };
-
-    // ZMIANA: Wywo³anie funkcji globalnej na zakresie
-    merge_sort(arr.begin(), arr.end());
-
-    EXPECT_EQ(arr, (vector<int>{1, 2, 3, 4, 5}));
+// 2. Odwrotnie posortowana
+TEST(MergeSortTest, Req02_ReverseSorted) {
+    MergeSorter<int> sorter;
+    std::vector<int> input = { 5, 4, 3, 2, 1 };
+    std::vector<int> expected = { 1, 2, 3, 4, 5 };
+    sorter.sort(input);
+    EXPECT_EQ(input, expected);
 }
 
-TEST(MergeSortTest, RandomArraySortsCorrectly) {
-    // ZMIANA: Usuniêto: mergeSort<int> sorter;
-    vector<int> arr = { 3,8,1,4,7,2 };
-
-    // ZMIANA: Wywo³anie funkcji globalnej na zakresie
-    merge_sort(arr.begin(), arr.end());
-
-    EXPECT_EQ(arr, (vector<int>{1, 2, 3, 4, 7, 8}));
+// 3. Losowa
+TEST(MergeSortTest, Req03_RandomArray) {
+    MergeSorter<int> sorter;
+    std::vector<int> input = { 12, 7, 14, 9, 10, 11 };
+    std::vector<int> expected = { 7, 9, 10, 11, 12, 14 };
+    sorter.sort(input);
+    EXPECT_EQ(input, expected);
 }
 
-TEST(MergeSortTest, NegativeNumbersSortCorrectly) {
-    // ZMIANA: Usuniêto: mergeSort<int> sorter;
-    vector<int> arr = { -5, -1, -10, -3 };
-
-    // ZMIANA: Wywo³anie funkcji globalnej na zakresie
-    merge_sort(arr.begin(), arr.end());
-
-    EXPECT_EQ(arr, (vector<int>{-10, -5, -3, -1}));
+// 4. Tylko ujemne
+TEST(MergeSortTest, Req04_OnlyNegative) {
+    MergeSorter<int> sorter;
+    std::vector<int> input = { -5, -1, -10, -3, -8 };
+    std::vector<int> expected = { -10, -8, -5, -3, -1 };
+    sorter.sort(input);
+    EXPECT_EQ(input, expected);
 }
 
-TEST(MergeSortTest, MixedPositiveNegativeSortsCorrectly) {
-    // ZMIANA: Usuniêto: mergeSort<int> sorter;
-    vector<int> arr = { 5, -2, 3, -1, 0 };
-
-    // ZMIANA: Wywo³anie funkcji globalnej na zakresie
-    merge_sort(arr.begin(), arr.end());
-
-    EXPECT_EQ(arr, (vector<int>{-2, -1, 0, 3, 5}));
+// 5. Ujemne i dodatnie
+TEST(MergeSortTest, Req05_MixedNegativePositive) {
+    MergeSorter<int> sorter;
+    std::vector<int> input = { -5, 10, 0, -2, 5 };
+    std::vector<int> expected = { -5, -2, 0, 5, 10 };
+    sorter.sort(input);
+    EXPECT_EQ(input, expected);
 }
 
-TEST(MergeSortTest, EmptyArrayDoesNotThrow) {
-    // ZMIANA: Usuniêto: mergeSort<int> sorter;
-    vector<int> arr;
-
-    // ZMIANA: Wywo³anie funkcji globalnej na zakresie
-    EXPECT_NO_THROW(merge_sort(arr.begin(), arr.end()));
-    EXPECT_TRUE(arr.empty());
+// 6. Pusta tablica
+TEST(MergeSortTest, Req06_EmptyArray) {
+    MergeSorter<int> sorter;
+    std::vector<int> input = {};
+    EXPECT_NO_THROW(sorter.sort(input));
+    EXPECT_TRUE(input.empty());
 }
 
-TEST(MergeSortTest, SingleElementArrayRemainsSame) {
-    // ZMIANA: Usuniêto: mergeSort<int> sorter;
-    vector<int> arr = { 42 };
-
-    // ZMIANA: Wywo³anie funkcji globalnej na zakresie
-    merge_sort(arr.begin(), arr.end());
-
-    EXPECT_EQ(arr, (vector<int>{42}));
+// 7. Jeden element
+TEST(MergeSortTest, Req07_SingleElement) {
+    MergeSorter<int> sorter;
+    std::vector<int> input = { 42 };
+    std::vector<int> expected = { 42 };
+    sorter.sort(input);
+    EXPECT_EQ(input, expected);
 }
 
-TEST(MergeSortTest, DuplicatesAreSortedCorrectly) {
-    // ZMIANA: Usuniêto: mergeSort<int> sorter;
-    vector<int> arr = { 4, 2, 2, 4, 1 };
-
-    // ZMIANA: Wywo³anie funkcji globalnej na zakresie
-    merge_sort(arr.begin(), arr.end());
-
-    EXPECT_EQ(arr, (vector<int>{1, 2, 2, 4, 4}));
+// 8. Duplikaty (dodatnie)
+TEST(MergeSortTest, Req08_DuplicatesPositive) {
+    MergeSorter<int> sorter;
+    std::vector<int> input = { 5, 1, 5, 2, 1 };
+    std::vector<int> expected = { 1, 1, 2, 5, 5 };
+    sorter.sort(input);
+    EXPECT_EQ(input, expected);
 }
 
-TEST(MergeSortTest, NegativeWithDuplicates) {
-    // ZMIANA: Usuniêto: mergeSort<int> sorter;
-    vector<int> arr = { -3, -1, -1, -5, -2 };
-
-    // ZMIANA: Wywo³anie funkcji globalnej na zakresie
-    merge_sort(arr.begin(), arr.end());
-
-    EXPECT_EQ(arr, (vector<int>{-5, -3, -2, -1, -1}));
+// 9. Duplikaty (ujemne)
+TEST(MergeSortTest, Req09_DuplicatesNegative) {
+    MergeSorter<int> sorter;
+    std::vector<int> input = { -5, -10, -5, -2, -10 };
+    std::vector<int> expected = { -10, -10, -5, -5, -2 };
+    sorter.sort(input);
+    EXPECT_EQ(input, expected);
 }
 
-TEST(MergeSortTest, MixedWithDuplicates) {
-    // ZMIANA: Usuniêto: mergeSort<int> sorter;
-    vector<int> arr = { 3, -1, 2, -1, 3, 0 };
-
-    // ZMIANA: Wywo³anie funkcji globalnej na zakresie
-    merge_sort(arr.begin(), arr.end());
-
-    EXPECT_EQ(arr, (vector<int>{-1, -1, 0, 2, 3, 3}));
+// 10. Mieszane z duplikatami
+TEST(MergeSortTest, Req10_DuplicatesMixed) {
+    MergeSorter<int> sorter;
+    std::vector<int> input = { -2, 5, 0, -2, 5, 0 };
+    std::vector<int> expected = { -2, -2, 0, 0, 5, 5 };
+    sorter.sort(input);
+    EXPECT_EQ(input, expected);
 }
 
-TEST(MergeSortTest, TwoElementArraySorted) {
-    // ZMIANA: Usuniêto: mergeSort<int> sorter;
-    vector<int> arr = { 5, 1 };
-
-    // ZMIANA: Wywo³anie funkcji globalnej na zakresie
-    merge_sort(arr.begin(), arr.end());
-
-    EXPECT_EQ(arr, (vector<int>{1, 5}));
+// 11. Dwa elementy
+TEST(MergeSortTest, Req11_TwoElementsSorted) {
+    MergeSorter<int> sorter;
+    std::vector<int> input = { 1, 10 };
+    std::vector<int> expected = { 1, 10 };
+    sorter.sort(input);
+    EXPECT_EQ(input, expected);
 }
 
-TEST(MergeSortTest, LargeArrayOver100Elements) {
-    // ZMIANA: Usuniêto: mergeSort<int> sorter;
-    vector<int> arr;
+// 12. Du¿a tablica (>100)
+TEST(MergeSortTest, Req12_LargeArraySimple) {
+    MergeSorter<int> sorter;
+    std::vector<int> input;
+    for (int i = 150; i > 0; --i) input.push_back(i);
 
-    for (int i = 200; i >= 0; i--) arr.push_back(i);
+    std::vector<int> expected = input;
+    std::sort(expected.begin(), expected.end());
 
-    // ZMIANA: Wywo³anie funkcji globalnej na zakresie
-    merge_sort(arr.begin(), arr.end());
-
-    for (int i = 0; i < 201; i++) {
-        EXPECT_EQ(arr[i], i);
-    }
+    sorter.sort(input);
+    EXPECT_EQ(input, expected);
 }
 
-TEST(MergeSortTest, LargeArrayMixedSign) {
-    // ZMIANA: Usuniêto: mergeSort<int> sorter;
-    vector<int> arr;
+// 13. Du¿a tablica (>100) complex
+TEST(MergeSortTest, Req13_LargeArrayComplex) {
+    MergeSorter<int> sorter;
+    std::vector<int> input;
+    for (int i = 0; i < 200; ++i) input.push_back((i % 50) - 25);
 
-    for (int i = 100; i >= -100; i--) arr.push_back(i);
+    std::vector<int> expected = input;
+    std::sort(expected.begin(), expected.end());
 
-    // ZMIANA: Wywo³anie funkcji globalnej na zakresie
-    merge_sort(arr.begin(), arr.end());
-
-    for (int i = 0; i < 201; i++) {
-        EXPECT_EQ(arr[i], -100 + i);
-    }
+    sorter.sort(input);
+    EXPECT_EQ(input, expected);
 }

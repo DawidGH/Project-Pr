@@ -1,96 +1,70 @@
-#pragma once
+#ifndef MERGESORT_H
+#define MERGESORT_H
+
 #include <vector>
-#include <iterator>
-#include <algorithm>
-#include <type_traits> // Dla std::decay_t
+#include <iostream>
 
-// Definiowanie typu wartoœci na podstawie iteratora
-template <typename Iterator>
-using ValueType = typename std::iterator_traits<Iterator>::value_type;
+// Definicja klasy szablonowej
+template <typename T>
+class MergeSorter {
+public:
+    // Publiczna metoda do wywo³ania sortowania
+    void sort(std::vector<T>& arr) {
+        if (arr.empty()) return;
+        mergeSort(arr, 0, static_cast<int>(arr.size()) - 1);
+    }
 
+private:
+    // Metoda rekurencyjna dziel¹ca tablicê
+    void mergeSort(std::vector<T>& arr, int left, int right) {
+        if (left >= right) return;
 
-namespace custom_sort {
+        int mid = left + (right - left) / 2;
 
-    /**
-     * @brief Funkcja scalaj¹ca dwa posortowane podci¹gi.
-     * U¿ywa bufora tymczasowego do wykonania scalania.
-     */
-    template <typename Iterator>
-    void merge(Iterator first, Iterator middle, Iterator last, std::vector<ValueType<Iterator>>& buffer) {
-        // Aliasy dla czytelnoœci
-        using T = ValueType<Iterator>;
+        mergeSort(arr, left, mid);
+        mergeSort(arr, mid + 1, right);
+        merge(arr, left, mid, right);
+    }
 
-        Iterator i = first;
-        Iterator j = middle;
+    // Metoda scalaj¹ca dwie posortowane czêœci
+    void merge(std::vector<T>& arr, int left, int mid, int right) {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
 
-        // Zapewnienie, ¿e bufor jest pusty i wystarczaj¹co du¿y (choæ w tym przypadku bufor jest
-        // alokowany raz na pocz¹tku, ale ta implementacja jest bardziej ogólna)
-        // W kontekœcie globalnej funkcji sortuj¹cej, bufor jest zarz¹dzany przez wywo³uj¹cego.
+        std::vector<T> L(n1);
+        std::vector<T> R(n2);
 
-        // Bufor musi byæ wystarczaj¹co du¿y dla sekcji [first, last)
-        size_t section_size = std::distance(first, last);
-        buffer.clear();
-        buffer.reserve(section_size);
+        for (int i = 0; i < n1; i++)
+            L[i] = arr[left + i];
+        for (int j = 0; j < n2; j++)
+            R[j] = arr[mid + 1 + j];
 
-        // 1. Scalanie do bufora tymczasowego
-        while (i != middle && j != last) {
-            if (*i <= *j) {
-                buffer.push_back(std::move(*i++));
+        int i = 0, j = 0, k = left;
+
+        while (i < n1 && j < n2) {
+            if (L[i] <= R[j]) {
+                arr[k] = L[i];
+                i++;
             }
             else {
-                buffer.push_back(std::move(*j++));
+                arr[k] = R[j];
+                j++;
             }
+            k++;
         }
 
-        // 2. Kopiowanie pozosta³ych elementów
-        std::move(i, middle, std::back_inserter(buffer));
-        std::move(j, last, std::back_inserter(buffer));
-
-        // 3. Kopiowanie posortowanych elementów z bufora z powrotem do oryginalnej sekcji
-        // U¿ywamy std::move, aby unikn¹æ zbêdnego kopiowania, jeœli to mo¿liwe
-        std::move(buffer.begin(), buffer.end(), first);
-    }
-
-
-    /**
-     * @brief Pomocnicza funkcja rekurencyjna.
-     */
-    template <typename Iterator>
-    void merge_sort_helper(Iterator first, Iterator last, std::vector<ValueType<Iterator>>& buffer) {
-        // Warunek bazowy: sekcja jest pusta lub zawiera jeden element
-        if (std::distance(first, last) <= 1) {
-            return;
+        while (i < n1) {
+            arr[k] = L[i];
+            i++;
+            k++;
         }
 
-        // Znajdowanie œrodkowego iteratora
-        Iterator middle = first;
-        std::advance(middle, std::distance(first, last) / 2);
-
-        // Dzielenie
-        merge_sort_helper(first, middle, buffer);
-        merge_sort_helper(middle, last, buffer);
-
-        // Scalanie
-        merge(first, middle, last, buffer);
-    }
-
-    /**
-     * @brief G³ówna funkcja Merge Sort.
-     * Sortuje sekwencjê w zakresie [first, last).
-     * @param first Iterator do pierwszego elementu.
-     * @param last Iterator za ostatnim elementem.
-     */
-    template <typename Iterator>
-    void merge_sort(Iterator first, Iterator last) {
-        if (first == last) {
-            return;
+        while (j < n2) {
+            arr[k] = R[j];
+            j++;
+            k++;
         }
-
-        // Alokacja bufora tymczasowego tylko raz (o maksymalnym potrzebnym rozmiarze)
-        std::vector<ValueType<Iterator>> buffer;
-        buffer.reserve(std::distance(first, last));
-
-        merge_sort_helper(first, last, buffer);
     }
+};
 
-} // namespace custom_sort
+#endif // MERGESORT_H

@@ -1,21 +1,17 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
-#include <iterator> // Dodane dla std::back_inserter i std::distance
-#include <type_traits> // Dodane dla std::is_same_v
-#include "mergeSort.h" // Zawiera teraz funkcjê custom_sort::merge_sort
+#include <limits>
+#include <type_traits>
+#include "MergeSort.h" 
 
-// Funkcja pomocnicza do wczytywania wektora od u¿ytkownika
 template <typename T>
 std::vector<T> readVector(const std::string& typeName) {
-    // ... (Logika wczytywania pozostaje bez zmian, jak w poprzedniej odpowiedzi) ...
-    // Uwaga: Dla uproszczenia, w pe³ni zaimplementowana wersja jest poni¿ej
-
     std::vector<T> vec;
     std::string line;
     T value;
 
-    std::cout << "Wprowadz elementy typu " << typeName << ", oddzielone spacjami (): \n> ";
+    std::cout << "\n>>> Wprowadz elementy typu " << typeName << " oddzielone spacjami (zatwierdz ENTER): \n> ";
     std::getline(std::cin, line);
     std::stringstream ss(line);
 
@@ -23,54 +19,65 @@ std::vector<T> readVector(const std::string& typeName) {
         vec.push_back(value);
     }
 
-    if (ss.fail() && !ss.eof()) {
-        std::cerr << "Ostrzezenie: Wprowadzono niepoprawne dane dla typu " << typeName << ". Wczytano tylko czesc elementow.\n";
-    }
-
     if (vec.empty()) {
-        std::cout << "Brak elementow do sortowania. Uzywam domyslnych.\n";
-        if constexpr (std::is_same_v<T, int>) return { 5, 2, 8, 1 };
-        if constexpr (std::is_same_v<T, long>) return { 100L, 20L, 5L, 40L };
-        //  if constexpr (std::is_same_v<T, float>) return { 3.14f, 1.1f, -2.5f, 0.0f };
-         // if constexpr (std::is_same_v<T, double>) return { 9.99, 3.3, 7.7, 2.2 };
+        std::cout << "(Brak danych - uzywam domyslnych)\n";
+        if constexpr (std::is_same_v<T, int>)    return { 10, 5, 2, 8, 1, 12, -3, 0 };
+        if constexpr (std::is_same_v<T, double>) return { 9.99, 3.14, 0.01, -2.5, 5.5, 1.1 };
         return {};
     }
-
     return vec;
 }
 
-// Funkcja pomocnicza do wyœwietlania wektora
 template <typename T>
-void printVector(const std::string& typeName, const std::vector<T>& vec) {
-    std::cout << "Posortowany " << typeName << ": ";
-    for (const auto& x : vec) {
-        std::cout << x << " ";
-    }
-    std::cout << "\n";
+void printVector(const std::vector<T>& vec) {
+    std::cout << "[ ";
+    for (const auto& x : vec) std::cout << x << " ";
+    std::cout << "]\n";
 }
 
 int main() {
-    // 1. Wczytywanie wektorów od u¿ytkownika
-    std::vector<int>    v1 = readVector<int>("int");
-    std::vector<long>   v2 = readVector<long>("long");
-    //std::vector<float>  v3 = readVector<float>("float");
-    //std::vector<double> v4 = readVector<double>("double");
+    int wybor;
+    bool czyDalej = true;
 
-    // 2. Sortowanie przy u¿yciu nowej globalnej funkcji
-    std::cout << "\nRozpoczynanie sortowania...\n";
+    while (czyDalej) {
+        std::cout << "\n=== MENU MERGE SORT ===\n";
+        std::cout << "1. Sortuj INT\n";
+        std::cout << "2. Sortuj DOUBLE\n";
+        std::cout << "0. Wyjscie\n";
+        std::cout << "Wybor: ";
+        std::cin >> wybor;
 
-    // U¿ywamy funkcji na zakresie [begin, end)
-    custom_sort::merge_sort(v1.begin(), v1.end());
-    custom_sort::merge_sort(v2.begin(), v2.end());
-    //custom_sort::merge_sort(v3.begin(), v3.end());
-    //custom_sort::merge_sort(v4.begin(), v4.end());
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Blad! Podaj liczbe.\n";
+            continue;
+        }
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Czyszczenie bufora
 
-    // 3. Wyœwietlanie wyników
-    std::cout << "\n--- Wyniki sortowania ---\n";
-    printVector("int", v1);
-    printVector("long", v2);
-    //printVector("float", v3);
-   // printVector("double", v4);
-
+        switch (wybor) {
+        case 1: {
+            MergeSorter<int> sorterInt;
+            std::vector<int> dane = readVector<int>("INT");
+            std::cout << "Przed: "; printVector(dane);
+            sorterInt.sort(dane);
+            std::cout << "Po:    "; printVector(dane);
+            break;
+        }
+        case 2: {
+            MergeSorter<double> sorterDouble;
+            std::vector<double> dane = readVector<double>("DOUBLE");
+            std::cout << "Przed: "; printVector(dane);
+            sorterDouble.sort(dane);
+            std::cout << "Po:    "; printVector(dane);
+            break;
+        }
+        case 0:
+            czyDalej = false;
+            break;
+        default:
+            std::cout << "Nieznana opcja.\n";
+        }
+    }
     return 0;
 }
